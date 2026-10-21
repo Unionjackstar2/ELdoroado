@@ -13,14 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Projekt aus EVRoute.zip entpacken (falls hochgeladen)
+      - name: Neueste EVRoute-ZIP finden und entpacken
         run: |
-          if [ -f EVRoute.zip ]; then
-            unzip -o -q EVRoute.zip -d _src
-            cp -r _src/EVRoute/. .
-            rm -rf _src
+          ZIP=""
+          NEWEST=0
+          while IFS= read -r f; do
+            t=$(git log -1 --format=%ct -- "$f")
+            t=${t:-0}
+            if [ "$t" -ge "$NEWEST" ]; then NEWEST=$t; ZIP="$f"; fi
+          done < <(find . -path ./.git -prune -o -iname 'EVRoute*.zip' -print)
+          if [ -z "$ZIP" ]; then
+            echo "::error::Keine EVRoute*.zip im Repository gefunden"
+            exit 1
           fi
+          echo "Verwende $ZIP"
+          unzip -o -q "$ZIP" -d _src
+          cp -r _src/EVRoute/. .
+          rm -rf _src
 
       - uses: actions/setup-java@v4
         with:
@@ -42,7 +54,7 @@ jobs:
           name: EVRoute-apk
           path: EVRoute.apk
 
-      - name: Als Release "neuester Build" veröffentlichen
+      - name: Als Release veröffentlichen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
