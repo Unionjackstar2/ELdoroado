@@ -1,0 +1,51 @@
+name: APK bauen
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Projekt aus EVRoute.zip entpacken (falls hochgeladen)
+        run: |
+          if [ -f EVRoute.zip ]; then
+            unzip -o -q EVRoute.zip -d _src
+            cp -r _src/EVRoute/. .
+            rm -rf _src
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: APK bauen
+        run: gradle assembleDebug --stacktrace
+
+      - name: APK umbenennen
+        run: cp app/build/outputs/apk/debug/app-debug.apk EVRoute.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EVRoute-apk
+          path: EVRoute.apk
+
+      - name: Als Release "neuester Build" veröffentlichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest EVRoute.apk --target "${{ github.sha }}" \
+            --title "EVRoute – neuester Build" --notes "Automatisch gebaut aus ${{ github.sha }}"
