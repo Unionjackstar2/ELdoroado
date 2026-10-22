@@ -39,6 +39,20 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Release-Schlüssel einrichten (falls als Secret hinterlegt)
+        env:
+          KS: ${{ secrets.KEYSTORE_BASE64 }}
+          KP: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KS" ] && [ -n "$KP" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "EVR_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+            echo "EVR_KEYSTORE_PASSWORD=$KP" >> "$GITHUB_ENV"
+            echo "Signiere mit Release-Schlüssel"
+          else
+            echo "Kein Release-Schlüssel hinterlegt, Debug-Schlüssel wird verwendet"
+          fi
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
