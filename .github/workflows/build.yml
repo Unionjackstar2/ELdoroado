@@ -54,6 +54,13 @@ jobs:
             echo "Kein Release-Schlüssel hinterlegt, Debug-Schlüssel wird verwendet"
           fi
 
+      - name: NDK und CMake für den KI-Assistenten installieren
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "ndk;27.2.12479018" "cmake;3.22.1" > /dev/null
+          echo "NDK und CMake bereit"
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
