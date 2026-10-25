@@ -17,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Neueste EVRoute-ZIP finden und entpacken
+      - name: Neueste ELdoroado-ZIP finden und entpacken
         run: |
           ZIP=""
           NEWEST=0
@@ -25,14 +25,14 @@ jobs:
             t=$(git log -1 --format=%ct -- "$f")
             t=${t:-0}
             if [ "$t" -ge "$NEWEST" ]; then NEWEST=$t; ZIP="$f"; fi
-          done < <(find . -path ./.git -prune -o -iname 'EVRoute*.zip' -print)
+          done < <(find . -path ./.git -prune -o -iname 'ELdoroado*.zip' -print)
           if [ -z "$ZIP" ]; then
-            echo "::error::Keine EVRoute*.zip im Repository gefunden"
+            echo "::error::Keine ELdoroado*.zip im Repository gefunden"
             exit 1
           fi
           echo "Verwende $ZIP"
           unzip -o -q "$ZIP" -d _src
-          cp -r _src/EVRoute/. .
+          cp -r _src/ELdoroado/. .
           rm -rf _src
 
       - uses: actions/setup-java@v4
@@ -69,22 +69,22 @@ jobs:
         run: gradle assembleDebug --stacktrace
 
       - name: APK umbenennen
-        run: cp app/build/outputs/apk/debug/app-debug.apk EVRoute.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk ELdoroado.apk
 
       - name: Signatur der APK anzeigen
         run: |
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
-          "$BT/apksigner" verify --print-certs EVRoute.apk | grep -i "SHA-256" || true
+          "$BT/apksigner" verify --print-certs ELdoroado.apk | grep -i "SHA-256" || true
 
       - uses: actions/upload-artifact@v4
         with:
-          name: EVRoute-apk
-          path: EVRoute.apk
+          name: ELdoroado-apk
+          path: ELdoroado.apk
 
       - name: Als Release veröffentlichen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest EVRoute.apk --target "${{ github.sha }}" \
-            --title "EVRoute – neuester Build" --notes "Automatisch gebaut aus ${{ github.sha }}"
+          gh release create latest ELdoroado.apk --target "${{ github.sha }}" \
+            --title "ELdoroado – neuester Build" --notes "Automatisch gebaut aus ${{ github.sha }}"
