@@ -95,25 +95,6 @@ Ohne TomTom-Key läuft die App mit freiem Routing (OSRM) und einer einfachen Akk
 
 ---
 
-## APK bauen und installieren
-
-Die APK wird über **GitHub Actions** gebaut. Android Studio ist nicht nötig.
-
-1. Projekt in ein (privates) GitHub-Repository hochladen.
-2. Die Datei `.github/workflows/build.yml` muss im Repository liegen.
-3. Bei jedem Push baut GitHub die App. Die fertige `ELdoroado.apk` liegt danach unter **Releases → „ELdoroado – neuester Build“**.
-4. APK auf dem Handy herunterladen und installieren (Installation aus dieser Quelle einmalig erlauben).
-
-### Optional: eigener Release-Schlüssel
-
-Damit alle Updates mit demselben Schlüssel signiert sind (z. B. für die Registrierung in der Android Developer Console), unter **Settings → Secrets and variables → Actions** anlegen:
-
-| Secret | Inhalt |
-|---|---|
-| `KEYSTORE_BASE64` | Keystore-Datei, Base64-kodiert |
-| `KEYSTORE_PASSWORD` | Passwort des Keystores (Alias `evroute`) |
-
-Ohne diese Secrets wird mit dem Debug-Schlüssel signiert. Im Build-Protokoll steht, welcher Schlüssel verwendet wurde. In der App steht er unter **Einstellungen → Info**.
 
 ---
 
