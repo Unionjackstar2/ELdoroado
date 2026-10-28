@@ -31,6 +31,11 @@ jobs:
             exit 1
           fi
           echo "Verwende $ZIP"
+          # ZIP mit „beta“ im Namen → Beta-App mit eigener Paketkennung und eigenem Release
+          case "$(basename "$ZIP" | tr '[:upper:]' '[:lower:]')" in
+            *beta*) echo "BETA=true" >> "$GITHUB_ENV"; echo "Baue Beta-Fassung" ;;
+            *) echo "BETA=false" >> "$GITHUB_ENV" ;;
+          esac
           unzip -o -q "$ZIP" -d _src
           cp -r _src/ELdoroado/. .
           rm -rf _src
@@ -66,7 +71,7 @@ jobs:
           gradle-version: '8.9'
 
       - name: APK bauen
-        run: gradle testDebugUnitTest assembleDebug --stacktrace
+        run: gradle testDebugUnitTest assembleDebug -Pbeta=$BETA --stacktrace
 
       - name: APK umbenennen
         run: cp app/build/outputs/apk/debug/app-debug.apk ELdoroado.apk
@@ -85,6 +90,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete latest --yes --cleanup-tag || true
-          gh release create latest ELdoroado.apk --target "${{ github.sha }}" \
-            --title "ELdoroado – neuester Build" --notes "Automatisch gebaut aus ${{ github.sha }}"
+          if [ "$BETA" = "true" ]; then
+            cp ELdoroado.apk ELdoroado-Beta.apk
+            gh release delete beta --yes --cleanup-tag || true
+            gh release create beta ELdoroado-Beta.apk --target "${{ github.sha }}" --prerelease \
+              --title "ELdoroado Beta – neuester Test-Build" --notes "Beta, läuft neben der normalen App. Gebaut aus ${{ github.sha }}"
+          else
+            gh release delete latest --yes --cleanup-tag || true
+            gh release create latest ELdoroado.apk --target "${{ github.sha }}" \
+              --title "ELdoroado – neuester Build" --notes "Automatisch gebaut aus ${{ github.sha }}"
+          fi
