@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Release-Schlüssel einrichten (falls als Secret hinterlegt)
         env:
@@ -63,14 +63,17 @@ jobs:
         run: |
           SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           yes | "$SDKM" --licenses > /dev/null || true
-          "$SDKM" "ndk;27.2.12479018" "cmake;3.22.1" > /dev/null
+          "$SDKM" "ndk;29.0.14206865" "cmake;3.22.1" > /dev/null
           echo "NDK und CMake bereit"
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.14.3'
 
       - name: APK bauen
+        env:
+          # Zugang zu den Valhalla-Kacheln auf dem eigenen Server (Repository-Secret VALHALLA_TILES_TOKEN)
+          ELD_TILES_TOKEN: ${{ secrets.VALHALLA_TILES_TOKEN }}
         run: gradle testDebugUnitTest assembleDebug -Pbeta=$BETA --stacktrace
 
       - name: APK umbenennen
