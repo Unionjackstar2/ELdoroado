@@ -1,0 +1,24 @@
+name: Als stabil sichern
+
+# Von Hand starten (Actions → „Als stabil sichern“ → Run workflow):
+# kopiert die aktuelle APK aus „latest“ in das Release „stabil“. Dorthin kann man jederzeit zurück.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  stable:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuelle APK als stabil ablegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release download latest --repo "$REPO" --pattern ELdoroado.apk --dir .
+          cp ELdoroado.apk ELdoroado-stabil.apk
+          gh release delete stabil --repo "$REPO" --yes --cleanup-tag || true
+          gh release create stabil ELdoroado-stabil.apk --repo "$REPO" --target "${{ github.sha }}" \
+            --title "ELdoroado – stabile Version" --notes "Gesichert am $(date +%d.%m.%Y) aus dem Release latest."
