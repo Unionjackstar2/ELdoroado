@@ -84,7 +84,6 @@ Die App ist ein Hobbyprojekt und Open Source. Sie kommt ohne Benutzerkonto, ohne
 ## Bekannte Grenzen
 
 - **Offline-Kartendaten** gibt es derzeit für Deutschland; weitere Länder sind in Vorbereitung.
-- **Ortssuche** braucht derzeit noch Internet; eine Offline-Suche ist in Arbeit.
 - **Staus in der Stadt** gibt es nur mit eigenem TomTom-Schlüssel.
 - **Keine Live-Belegung** von Ladesäulen.
 - **Kein Android Auto.**
