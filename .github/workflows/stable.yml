@@ -20,5 +20,5 @@ jobs:
           gh release download latest --repo "$REPO" --pattern ELdoroado.apk --dir .
           cp ELdoroado.apk ELdoroado-stabil.apk
           gh release delete stabil --repo "$REPO" --yes --cleanup-tag || true
-          gh release create stabil ELdoroado-stabil.apk --repo "$REPO" --target "${{ github.sha }}" \
+          gh release create stabil ELdoroado-stabil.apk --repo "$REPO" --target "${{ github.sha }}" --latest=false \
             --title "ELdoroado – stabile Version" --notes "Gesichert am $(date +%d.%m.%Y) aus dem Release latest."
