@@ -96,10 +96,11 @@ jobs:
           if [ "$BETA" = "true" ]; then
             cp ELdoroado.apk ELdoroado-Beta.apk
             gh release delete beta --yes --cleanup-tag || true
-            gh release create beta ELdoroado-Beta.apk --target "${{ github.sha }}" --prerelease \
+            # als „Latest“ markieren, damit die Beta rechts auf der Startseite unter „Releases“ erscheint
+            gh release create beta ELdoroado-Beta.apk --target "${{ github.sha }}" --latest \
               --title "ELdoroado Beta – neuester Test-Build" --notes "Beta, läuft neben der normalen App. Gebaut aus ${{ github.sha }}"
           else
             gh release delete latest --yes --cleanup-tag || true
-            gh release create latest ELdoroado.apk --target "${{ github.sha }}" \
+            gh release create latest ELdoroado.apk --target "${{ github.sha }}" --latest=false \
               --title "ELdoroado – neuester Build" --notes "Automatisch gebaut aus ${{ github.sha }}"
           fi
